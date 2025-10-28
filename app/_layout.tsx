@@ -1,24 +1,29 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import React from "react";
+import { Stack } from "expo-router";
+import { useColorScheme } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
-
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
+const scheme = useColorScheme();
+const backgroundColor = scheme === "dark" ? "#0a0a0a" : "#ffffff";
+const tint = scheme === "dark" ? "#d4d4d4" : "#111827";
 
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
-  );
+
+return (
+<GestureHandlerRootView style={{ flex: 1, backgroundColor }}>
+<Stack
+screenOptions={{
+headerStyle: { backgroundColor },
+headerTintColor: tint,
+contentStyle: { backgroundColor },
+}}
+>
+<Stack.Screen name="index" options={{ title: "Book My Seat" }} />
+<Stack.Screen name="booking/new" options={{ title: "New Booking" }} />
+<Stack.Screen name="booking/[id]" options={{ title: "Booking Detail" }} />
+<Stack.Screen name="history" options={{ title: "History" }} />
+</Stack>
+</GestureHandlerRootView>
+);
 }
