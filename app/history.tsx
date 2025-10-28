@@ -6,15 +6,24 @@ import { formatCurrency } from "../lib/format";
 export default function History() {
   const { bookings } = useBookingStore();
   const scheme = useColorScheme();
-  const paid = useMemo(() => bookings.filter(b => b.paid), [bookings]);
+
+  // Filter hanya booking yang sudah dibayar
+  const paid = useMemo(() => bookings.filter((b) => b.paid), [bookings]);
+
+  // Theme colors
   const text = scheme === "dark" ? "#e5e7eb" : "#111827";
   const muted = scheme === "dark" ? "#9ca3af" : "#6b7280";
+  const bg = scheme === "dark" ? "#0a0a0a" : "#fafafa";
+  const card = scheme === "dark" ? "#111827" : "#ffffff";
+  const border = scheme === "dark" ? "#1f2937" : "#e5e7eb";
 
   return (
-    <View style={{ flex: 1, padding: 16 }}>
-      <Text style={{ color: text, fontSize: 18, fontWeight: "700" }}>Paid / Completed</Text>
+    <View style={{ flex: 1, backgroundColor: bg, padding: 16 }}>
+      <Text style={{ color: text, fontSize: 18, fontWeight: "700", marginBottom: 10 }}>
+        Paid / Completed Bookings
+      </Text>
+
       <FlatList
-        style={{ marginTop: 10 }}
         data={paid}
         keyExtractor={(item) => item.id}
         ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
@@ -23,13 +32,53 @@ export default function History() {
             <Text style={{ color: muted }}>No paid bookings yet.</Text>
           </View>
         )}
-        renderItem={({ item }) => (
-          <View style={{ padding: 14, borderRadius: 12, backgroundColor: scheme === "dark" ? "#111827" : "#ffffff", borderWidth: 1, borderColor: scheme === "dark" ? "#1f2937" : "#e5e7eb" }}>
-            <Text style={{ color: text, fontWeight: "700" }}>{item.title}</Text>
-            <Text style={{ color: muted }}>{item.venue} • {item.date} • {item.category}</Text>
-            <Text style={{ color: text }}>{item.quantity} × {formatCurrency(item.price)} = {formatCurrency(item.quantity * item.price)}</Text>
-          </View>
-        )}
+        renderItem={({ item }) => {
+          const total = item.quantity * item.price;
+          return (
+            <View
+              style={{
+                padding: 14,
+                borderRadius: 12,
+                backgroundColor: card,
+                borderWidth: 1,
+                borderColor: border,
+              }}
+            >
+              {/* Judul event */}
+              <Text style={{ color: text, fontWeight: "700", fontSize: 16 }}>
+                {item.title}
+              </Text>
+              <Text style={{ color: muted, marginBottom: 4 }}>
+                {item.venue} • {item.date} • {item.category}
+              </Text>
+
+              {/* Info customer */}
+              <View style={{ marginBottom: 6 }}>
+                <Text style={{ color: text, fontWeight: "600" }}>
+                  {item.customer_name}
+                </Text>
+                <Text style={{ color: muted, fontSize: 12 }}>
+                  {item.customer_email}
+                </Text>
+              </View>
+
+              {/* Info harga */}
+              <Text style={{ color: muted, fontSize: 13 }}>
+                {item.quantity} × {formatCurrency(item.price)}
+              </Text>
+              <Text
+                style={{
+                  color: text,
+                  fontWeight: "700",
+                  marginTop: 4,
+                  fontSize: 14,
+                }}
+              >
+                Total: {formatCurrency(total)}
+              </Text>
+            </View>
+          );
+        }}
       />
     </View>
   );

@@ -4,22 +4,28 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export interface Booking {
   id: string;
+  eventId: string;
   title: string;
   venue: string;
   date: string;
-  quantity: number;
   category: string;
   price: number;
+  quantity: number;
+  customer_name: string;
+  customer_email: string;
   paid: boolean;
 }
 
 export interface BookingInput {
+  eventId: string;
   title: string;
   venue: string;
   date: string;
-  quantity: number;
   category: string;
   price: number;
+  quantity: number;
+  customer_name: string;
+  customer_email: string;
 }
 
 interface BookingState {
