@@ -49,7 +49,7 @@
 ## 📁 Struktur Folder
 
 ```
-book-my-seat/
+bookmyseat-uts/
 │
 ├── app/
 │   ├── _layout.tsx              # Struktur utama navigasi
@@ -60,7 +60,7 @@ book-my-seat/
 │   └── history.tsx              # Halaman riwayat booking
 │
 ├── components/
-│   └── BookingCard.tsx          # Komponen kartu daftar booking
+│   └── booking-card.tsx          # Komponen kartu daftar booking
 │
 ├── store/
 │   └── use-bookings.ts          # Store Zustand + AsyncStorage
@@ -188,7 +188,7 @@ await AsyncStorage.clear();
 ## 📜 Lisensi & Catatan
 
 📄 **Lisensi:** MIT  
-🧑‍💻 **Dibuat oleh:** Ema Maleni 
+🧑‍💻 **Dibuat oleh:** Ema Maleni <br>
 📅 **Tahun:** 2025  
 
 > Aplikasi ini dikembangkan untuk kebutuhan pembelajaran dan proyek praktikum.  
