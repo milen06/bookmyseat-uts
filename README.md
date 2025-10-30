@@ -185,6 +185,16 @@ await AsyncStorage.clear();
 
 ---
 
+## 🎥 Video Demo
+
+Lihat demo aplikasi melalui tautan berikut:
+
+👉 [Loom Video Demo](https://www.loom.com/share/b6f4d0c03d984aa08f412cd12e2e3ff1)
+
+*(Ganti dengan link Loom kamu setelah upload video demonya)*
+
+---
+
 ## 📜 Lisensi & Catatan
 
 📄 **Lisensi:** MIT  
