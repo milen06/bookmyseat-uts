@@ -13,7 +13,7 @@ import {
 import { useRouter } from "expo-router";
 import { useBookingStore } from "../../store/use-bookings";
 
-// Daftar event yang sudah ada (bisa dari API nantinya)
+// Dummy events (UI only, NOT saved as eventId)
 const EVENTS = [
   {
     id: "e1",
@@ -46,7 +46,7 @@ export default function NewBooking() {
   const router = useRouter();
   const scheme = useColorScheme();
 
-  const [selectedEvent, setSelectedEvent] = useState<typeof EVENTS[0] | null>(
+  const [selectedEvent, setSelectedEvent] = useState<(typeof EVENTS)[0] | null>(
     null
   );
   const [quantity, setQuantity] = useState("1");
@@ -70,26 +70,27 @@ export default function NewBooking() {
     marginBottom: 12,
   } as const;
 
-  const submit = () => {
+  const submit = async () => {
     if (!selectedEvent) {
       Alert.alert("Validation", "Please select an event.");
       return;
     }
+
     if (!customerName.trim() || !customerEmail.trim()) {
       Alert.alert("Validation", "Please fill your name and email.");
       return;
     }
 
-    addBooking({
-      eventId: selectedEvent.id,
+    await addBooking({
       title: selectedEvent.title,
       venue: selectedEvent.venue,
-      date: selectedEvent.date,
       category: selectedEvent.category,
-      price: selectedEvent.price,
-      quantity: Math.max(1, Number(quantity) || 1),
       customer_name: customerName.trim(),
       customer_email: customerEmail.trim(),
+      quantity: Math.max(1, Number(quantity) || 1),
+      price: selectedEvent.price,
+      paid: false,
+      date: selectedEvent.date, // sesuai kolom Supabase
     });
 
     Alert.alert("Success", "Your booking has been created!");
@@ -106,7 +107,14 @@ export default function NewBooking() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={{ color: text, fontSize: 18, fontWeight: "700", marginBottom: 10 }}>
+        <Text
+          style={{
+            color: text,
+            fontSize: 18,
+            fontWeight: "700",
+            marginBottom: 10,
+          }}
+        >
           Select Event
         </Text>
 
@@ -138,26 +146,6 @@ export default function NewBooking() {
 
         {selectedEvent && (
           <>
-            <View
-              style={{
-                borderWidth: 1,
-                borderColor: border,
-                borderRadius: 12,
-                padding: 14,
-                marginBottom: 14,
-              }}
-            >
-              <Text style={{ color: text, fontWeight: "700", marginBottom: 6 }}>
-                Selected Event:
-              </Text>
-              <Text style={{ color: text }}>{selectedEvent.title}</Text>
-              <Text style={{ color: muted }}>{selectedEvent.venue}</Text>
-              <Text style={{ color: muted }}>
-                {selectedEvent.category} • Rp{" "}
-                {selectedEvent.price.toLocaleString("id-ID")}
-              </Text>
-            </View>
-
             <Text style={{ color: text, fontSize: 16, marginBottom: 6 }}>
               Quantity
             </Text>

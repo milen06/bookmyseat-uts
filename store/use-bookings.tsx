@@ -1,79 +1,93 @@
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { supabase } from "../lib/supabase";
 
-export interface Booking {
+export type Booking = {
   id: string;
-  eventId: string;
   title: string;
   venue: string;
-  date: string;
   category: string;
-  price: number;
-  quantity: number;
   customer_name: string;
   customer_email: string;
+  quantity: number;
+  price: number;
   paid: boolean;
-}
-
-export interface BookingInput {
-  eventId: string;
-  title: string;
-  venue: string;
   date: string;
-  category: string;
-  price: number;
-  quantity: number;
-  customer_name: string;
-  customer_email: string;
-}
+};
 
-interface BookingState {
+type NewBooking = Omit<Booking, "id">;
+
+type BookingStore = {
   bookings: Booking[];
-  addBooking: (data: BookingInput) => void;
-  removeBooking: (id: string) => void;
-  toggleStatus: (id: string) => void;
-  editBooking: (id: string, updated: BookingInput) => void;
-}
+  fetchBookings: () => Promise<void>;
+  addBooking: (booking: NewBooking) => Promise<void>; 
+  removeBooking: (id: string) => Promise<void>;
+  toggleStatus: (id: string) => Promise<void>;
+};
 
-// ID unik sederhana
-const uid = () =>
-  Math.random().toString(36).substring(2, 10) +
-  Date.now().toString(36).substring(5);
+export const useBookingStore = create<BookingStore>((set, get) => ({
+  bookings: [],
 
-// Zustand + AsyncStorage persist
-export const useBookingStore = create<BookingState>()(
-  persist(
-    (set) => ({
-      bookings: [],
+  // READ
+  fetchBookings: async () => {
+    const { data, error } = await supabase
+      .from("bookings")
+      .select("*")
+      .order("date", { ascending: true });
 
-      addBooking: (data) =>
-        set((state) => ({
-          bookings: [...state.bookings, { id: uid(), paid: false, ...data }],
-        })),
-
-      removeBooking: (id) =>
-        set((state) => ({
-          bookings: state.bookings.filter((b) => b.id !== id),
-        })),
-
-      toggleStatus: (id) =>
-        set((state) => ({
-          bookings: state.bookings.map((b) =>
-            b.id === id ? { ...b, paid: !b.paid } : b
-          ),
-        })),
-
-      editBooking: (id, updated) =>
-        set((state) => ({
-          bookings: state.bookings.map((b) =>
-            b.id === id ? { ...b, ...updated } : b
-          ),
-        })),
-    }),
-    {
-      name: "bookings-storage",
-      storage: createJSONStorage(() => AsyncStorage),
+    if (error) {
+      console.error("fetchBookings error:", error);
+      return;
     }
-  )
-);
+
+    set({ bookings: data ?? [] });
+  },
+
+  // CREATE ✅ (INI YANG HILANG)
+  addBooking: async (booking) => {
+    const { data, error } = await supabase
+      .from("bookings")
+      .insert([booking])
+      .select()
+      .single();
+
+    if (error) {
+      console.error("addBooking error:", error);
+      return;
+    }
+
+    set({ bookings: [...get().bookings, data] });
+  },
+
+  // DELETE
+  removeBooking: async (id) => {
+    const { error } = await supabase
+      .from("bookings")
+      .delete()
+      .eq("id", id);
+
+    if (!error) {
+      set({
+        bookings: get().bookings.filter((b) => b.id !== id),
+      });
+    }
+  },
+
+  // UPDATE
+  toggleStatus: async (id) => {
+    const booking = get().bookings.find((b) => b.id === id);
+    if (!booking) return;
+
+    const { error } = await supabase
+      .from("bookings")
+      .update({ paid: !booking.paid })
+      .eq("id", id);
+
+    if (!error) {
+      set({
+        bookings: get().bookings.map((b) =>
+          b.id === id ? { ...b, paid: !b.paid } : b
+        ),
+      });
+    }
+  },
+}));

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,8 @@ import {
   useColorScheme,
 } from "react-native";
 import { Link, useRouter } from "expo-router";
+import * as Linking from "expo-linking";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useBookingStore } from "../store/use-bookings";
 import { formatCurrency } from "../lib/format";
 
@@ -18,6 +20,32 @@ export default function Home() {
   const [onlyPaid, setOnlyPaid] = useState(false);
   const scheme = useColorScheme();
   const router = useRouter();
+
+  useEffect(() => {
+  const handleDeferredDeepLink = async () => {
+    // Ambil URL pertama kali app dibuka
+    const url = await Linking.getInitialURL();
+
+    if (url) {
+      const parsed = Linking.parse(url);
+      const redirect = parsed.queryParams?.redirect as string | undefined;
+
+      if (redirect) {
+        await AsyncStorage.setItem("deferred_redirect", redirect);
+      }
+    }
+
+    // Ambil redirect yg tersimpan
+    const savedRedirect = await AsyncStorage.getItem("deferred_redirect");
+
+    if (savedRedirect) {
+      await AsyncStorage.removeItem("deferred_redirect");
+      router.replace({ pathname: savedRedirect as any });
+    }
+  };
+
+  handleDeferredDeepLink();
+}, []);
 
   // Filter booking berdasarkan pencarian dan status
   const filtered = useMemo(() => {
