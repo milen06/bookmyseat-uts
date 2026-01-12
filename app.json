@@ -2,7 +2,7 @@
   "expo": {
     "name": "bookmyseat-uts",
     "slug": "bookmyseat-uts",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "bookmyseatuts",
@@ -20,7 +20,8 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.eunoias.bookmyseatuts"
+      "package": "com.eunoias.bookmyseatuts",
+      "versionCode": 2
     },
     "web": {
       "output": "static",
